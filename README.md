@@ -1,1 +1,1 @@
-# demo-flask# cocktail-recipe
+# cocktail-recipe

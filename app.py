@@ -10,6 +10,7 @@ import utils.rest_utils as rest_utils
 from application_services.imdb_artists_resource import IMDBArtistResource
 from application_services.UsersResource.user_service import UserResource
 from database_services.RDBService import RDBService as RDBService
+from application_services.RecipesResource.recipe_resource import RecipeResource
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -89,6 +90,22 @@ def user_collection():
     res = UserResource.get_by_template(None)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
+
+
+@app.route('/recipes', methods=['GET'])
+def recipe_collection():
+    if request.method == 'GET':
+        res = RecipeResource.get_by_template(None)
+        rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+        return rsp
+
+
+@app.route('/recipes/<recipe_id>', methods=["GET"])
+def specific_recipe(recipe_id):
+    res = RecipeResource.get_by_recipe_id(recipe_id)
+    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    return rsp
+
 
 @app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
 def specific_user(user_id):
