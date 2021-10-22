@@ -1,5 +1,6 @@
 .idea/
 
+__pycache__/
 application_services/__pycache__/
 application_services/RecipesResource/__pycache__/
 database_services/__pycache__/
