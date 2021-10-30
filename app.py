@@ -7,6 +7,7 @@ from datetime import datetime
 import utils.rest_utils as rest_utils
 
 from application_services.RecipesResource.recipe_resource import RecipeResource
+from application_services.InventoriesResource.inventory_resource import InventoryResource
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -75,6 +76,20 @@ def recipe_collection():
 @app.route('/recipes/<recipe_id>', methods=["GET"])
 def specific_recipe(recipe_id):
     res = RecipeResource.get_by_recipe_id(recipe_id)
+    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    return rsp
+
+
+@app.route('/inventories', methods=['GET'])
+def all_inventories():
+    res = InventoryResource.get_by_template(None)
+    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    return rsp
+
+
+@app.route('/inventories/<inventory_id>', methods=['GET'])
+def specific_inventory(inventory_id):
+    res = InventoryResource.get_by_inventory_id(inventory_id)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
