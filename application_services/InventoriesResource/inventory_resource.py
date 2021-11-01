@@ -15,9 +15,10 @@ class InventoryResource(BaseRDBApplicationResource):
     def get_data_resource_info(cls):
         return 'cocktails', 'inventories'
 
-    def get_by_inventory_id(self):
+    @classmethod
+    def get_by_inventory_id(self, inventory_id):
         sql = "SELECT inventory_id, inventory_name, ingredient_name, brand, measurement_qty, unit_name, abv, price " \
-              "FROM (SELECT * FROM cocktails.inventories WHERE inventory_id = 1) AS a " \
+              "FROM (SELECT * FROM cocktails.inventories WHERE inventory_id = " + inventory_id +") AS a " \
               "JOIN cocktails.ingredients ON a.ingredient_id = ingredients.ingredient_id " \
               "JOIN cocktails.units ON a.unit_id = units.unit_id;"
 
