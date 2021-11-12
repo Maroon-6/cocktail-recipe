@@ -73,9 +73,9 @@ def recipe_collection():
         return rsp
 
 
-@app.route('/recipes/<recipe_id>', methods=["GET"])
-def specific_recipe(recipe_id):
-    res = RecipeResource.get_by_recipe_id(recipe_id)
+@app.route('/recipes/<recipe_name>', methods=["GET"])
+def specific_recipe(recipe_name):
+    res = RecipeResource.get_by_recipe_id(recipe_name)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
