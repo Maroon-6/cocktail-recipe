@@ -117,5 +117,11 @@ class RDBService:
         sql_stmt = "insert into " + db_schema + "." + table_name + " " + cols_clause + \
             " " + vals_clause
 
-        res = RDBService._run_sql(sql_stmt, args)
+        res = RDBService.run_sql(sql_stmt, args)
         return res
+
+    @classmethod
+    def count(cls, db_schema, table_name, column_name):
+        sql_stmt = "SELECT COUNT(" + column_name + ") as cnt FROM " + db_schema + "." + table_name
+        res = RDBService.run_sql(sql_stmt, None, True)
+        return res[0]["cnt"]
