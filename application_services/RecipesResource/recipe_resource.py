@@ -17,35 +17,85 @@ class RecipeResource(BaseRDBApplicationResource):
         return 'cocktails', 'recipes'
 
     @classmethod
-    def get_by_recipe_id(cls, recipe_id):
-        sql = "SELECT aa.recipe_id, aa.recipe_name, bb.quantity, dd.unit_name, cc.ingredient_name FROM " \
-              "(SELECT * FROM cocktails.recipes where cocktails.recipes.recipe_id = " + recipe_id + ") AS aa " \
-              "JOIN cocktails.recipe_ingredients AS bb " \
-              "ON aa.recipe_id = bb.recipe_id " \
-              "JOIN cocktails.ingredients AS cc " \
-              "ON bb.ingredient_id = cc.ingredient_id " \
-              "JOIN cocktails.units AS dd " \
-              "on bb.unit_id = dd.unit_id;"
-
-        sql_res = RDBService.run_sql(sql, None, True)
+    def get_by_recipe_name(cls, recipe_name):
+        sql_res = RDBService.find_by_template("cocktails", "recipes", {"recipe_name": recipe_name}, None)
         if not sql_res:
             return None
 
         res = OrderedDict()
-        res["recipe_id"] = sql_res[0]["recipe_id"]
-        res["recipe_name"] = sql_res[0]["recipe_name"]
+        res["recipe_name"] = recipe_name
+        res["description"] = sql_res[0]["description"]
+        res["contributor"] = sql_res[0]["contributor"]
         res["ingredients"] = []
 
+        sql_res = RDBService.find_by_template("cocktails", "recipe_ingredients", {"recipe": recipe_name}, None)
+
         for item in sql_res:
+            if item["garnish"] and item.get("ingredient", None):
+                res["ingredients"].append("Garnish by: " + item["ingredient"])
+                continue
             arr = []
             if item.get("quantity", None):
                 arr.append(item["quantity"])
-            if item.get("unit_name", None):
-                arr.append(item["unit_name"])
-            if item.get("ingredient_name", None):
-                arr.append(item["ingredient_name"])
+            if item.get("unit", None):
+                arr.append(item["unit"])
+            if item.get("ingredient", None):
+                arr.append(item["ingredient"])
             ingredient = " ".join(arr)
             if ingredient:
                 res["ingredients"].append(ingredient)
 
         return res
+
+    @classmethod
+    def add_ingredient(cls, ingredient_name):
+        sql_res = RDBService.find_by_template("cocktails", "ingredients", {"ingredient_name": ingredient_name}, None)
+        # ingredient already exists
+        if sql_res:
+            return
+        ingredient = {"ingredient_name": ingredient_name}
+        RDBService.create("cocktails", "ingredients", ingredient)
+
+    @classmethod
+    def add_unit(cls, unit_name):
+        sql_res = RDBService.find_by_template("cocktails", "units", {"unit_name": unit_name}, None)
+        # ingredient already exists
+        if sql_res:
+            return
+        unit = {"unit_name": unit_name}
+        RDBService.create("cocktails", "units", unit)
+
+    @classmethod
+    def add_recipe(cls, data):
+        recipe_name = data["recipe_name"]
+        sql_res = RDBService.find_by_template("cocktails", "recipes", {"recipe_name": recipe_name}, None)
+        # recipe already exists
+        if sql_res:
+            return False
+
+        recipe = {"recipe_name": data["recipe_name"],
+                  "description": data.get("description", None),
+                  "contributor": data.get("contributor", None)}
+        RDBService.create("cocktails", "recipes", recipe)
+
+        for item in data["ingredients"]:
+            ingredient_name = item.get("ingredient_name", None)
+            if not ingredient_name:
+                continue
+            cls.add_ingredient(ingredient_name)
+            ingredient = {"recipe": recipe_name, "ingredient": ingredient_name}
+            if item.get("garnish", False):
+                ingredient["garnish"] = 1
+            else:
+                ingredient["garnish"] = 0
+                qty = item.get("quantity", None)
+                if qty:
+                    ingredient["quantity"] = qty
+                unit = item.get("unit", None)
+                if unit:
+                    cls.add_unit(unit)
+                    ingredient["unit"] = unit
+            RDBService.create("cocktails", "recipe_ingredients", ingredient)
+
+        return True
+

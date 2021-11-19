@@ -8,6 +8,7 @@ import utils.rest_utils as rest_utils
 
 from application_services.RecipesResource.recipe_resource import RecipeResource
 from application_services.InventoriesResource.inventory_resource import InventoryResource
+from database_services.RDBService import RDBService
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -65,17 +66,26 @@ def hello_world():
     return '<u>Hello World!</u>'
 
 
-@app.route('/recipes', methods=['GET'])
+@app.route('/recipes', methods=['GET', 'POST'])
 def recipe_collection():
     if request.method == 'GET':
         res = RecipeResource.get_by_template(None)
         rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
         return rsp
-
+    elif request.method == 'POST':
+        data = request.json
+        res = RecipeResource.add_recipe(data)
+        if res:
+            msg = "New recipe added!"
+            rsp = Response(json.dumps(msg, default=str), status=201, content_type="application/json")
+        else:
+            msg = "Recipe already exists!"
+            rsp = Response(json.dumps(msg, default=str), status=200, content_type="application/json")
+        return rsp
 
 @app.route('/recipes/<recipe_name>', methods=["GET"])
 def specific_recipe(recipe_name):
-    res = RecipeResource.get_by_recipe_id(recipe_name)
+    res = RecipeResource.get_by_recipe_name(recipe_name)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
@@ -92,7 +102,6 @@ def specific_inventory(inventory_id):
     res = InventoryResource.get_by_inventory_id(inventory_id)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
-
 
 
 if __name__ == '__main__':
