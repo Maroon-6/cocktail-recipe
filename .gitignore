@@ -3,6 +3,7 @@
 __pycache__/
 application_services/__pycache__/
 application_services/RecipesResource/__pycache__/
+application_services/InventoriesResource/__pycache__/
 database_services/__pycache__/
 middleware/__pycache__/
 utils/__pycache__/
