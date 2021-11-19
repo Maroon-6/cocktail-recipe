@@ -13,7 +13,7 @@
 > database design for recipes and inventories
 ![database for recipes and inventories](./recipes_database_screenshot.png)
 >
-> Find sql script for creating the tables in ./SQLSripts
+> Find sql script for creating the tables in ./SQLScripts
 
 
 #### Request message examples for POST
