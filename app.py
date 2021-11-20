@@ -1,14 +1,19 @@
-from flask import Flask, Response, request
+import os
+
+from flask import Flask, Response, request, redirect, url_for
 from flask_cors import CORS
 import json
 import logging
 from datetime import datetime
+
+from flask_dance.contrib.google import make_google_blueprint, google
 
 import utils.rest_utils as rest_utils
 
 from application_services.RecipesResource.recipe_resource import RecipeResource
 from application_services.InventoriesResource.inventory_resource import InventoryResource
 from database_services.RDBService import RDBService
+from middleware import security
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -16,6 +21,31 @@ logger.setLevel(logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+app.secret_key = "some secret"
+
+blueprint = make_google_blueprint(
+    client_id='1027342541063-p5o91gkgoot1q6466c3tesm3gtlpce0j.apps.googleusercontent.com',
+    client_secret='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',
+    reprompt_consent=True,
+    scope=["profile", "email"]
+)
+
+app.register_blueprint(blueprint, url_prefix="/login")
+
+
+@app.before_request
+def before_decorator():
+    result_ok = security.check_security
+
+
+@app.after_request
+def after_decorator(rsp):
+    print("...In after decorator...")
+    return rsp
+
 
 ##################################################################################################################
 
@@ -66,6 +96,16 @@ def hello_world():
     return '<u>Hello World!</u>'
 
 
+@app.route('/login')
+def login():
+    google_data = None
+    user_info_endpoint = 'oauth2/v2/userinfo'
+    if google.authorized:
+        google_data = google.get(user_info_endpoint).json()
+    else:
+        return redirect(url_for("google.login"))
+
+
 @app.route('/recipes', methods=['GET', 'POST'])
 def recipe_collection():
     if request.method == 'GET':
@@ -82,6 +122,7 @@ def recipe_collection():
             msg = "Recipe already exists!"
             rsp = Response(json.dumps(msg, default=str), status=200, content_type="application/json")
         return rsp
+
 
 @app.route('/recipes/<recipe_name>', methods=["GET"])
 def specific_recipe(recipe_name):
@@ -105,4 +146,4 @@ def specific_inventory(inventory_id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run(host="127.0.0.1", port=5000)
