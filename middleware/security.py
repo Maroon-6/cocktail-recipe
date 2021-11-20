@@ -1,6 +1,6 @@
 import json
 
-secure_paths = ["/recipes"]
+secure_paths = ["/recipes", "/inventories"]
 
 
 def check_security(request, google, blueprint):
