@@ -25,3 +25,15 @@ class InventoryResource(BaseRDBApplicationResource):
         sql_res = RDBService.run_sql(sql, None, True)
         return sql_res
 
+    # @classmethod
+    # def get_lowest_price_by_ingredient_name(cls, ingredient_name):
+    #     sql_res = InventoryResource.get_by_template(None)
+    #
+    #     prices = []
+    #     for item in sql_res:
+    #         if item["ingredient_name"] == ingredient_name:
+    #             prices.append(item["price"])
+    #
+    #     min_price = min(prices)
+    #
+    #     return min_price

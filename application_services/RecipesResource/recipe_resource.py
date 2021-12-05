@@ -47,6 +47,19 @@ class RecipeResource(BaseRDBApplicationResource):
 
         return res
 
+
+    @classmethod
+    def get_ingredients_by_recipe(cls, recipe_name):
+
+        sql_res = RDBService.find_by_template("cocktails", "recipe_ingredients", {"recipe": recipe_name}, None)
+
+        ingredients = []
+        for item in sql_res:
+            ingredients.append(item["ingredient"])
+
+        return ingredients
+
+
     @classmethod
     def add_ingredient(cls, ingredient_name):
         sql_res = RDBService.find_by_template("cocktails", "ingredients", {"ingredient_name": ingredient_name}, None)

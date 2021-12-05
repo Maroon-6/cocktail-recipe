@@ -131,6 +131,34 @@ def specific_recipe(recipe_name):
     return rsp
 
 
+
+@app.route('/recipes/<recipe_name>/ingredients', methods=["GET"])
+def get_ingredients_recipe(recipe_name):
+    res = RecipeResource.get_ingredients_by_recipe(recipe_name)
+    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    return rsp
+
+# # lowest total price of the recipe
+# @app.route('/recipes/<recipe_name>/price', methods=["GET"])
+# def lowest_total_price_recipe(recipe_name):
+#     res = RecipeResource.get_ingredients_by_recipe(recipe_name)
+#     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+#     return rsp
+
+@app.route('/inventories/<ingredient_name>', methods=["GET"])
+def lowest_price_of_ingredient(ingredient_name):
+    res = InventoryResource.get_by_template(None)
+    prices = []
+    for item in res:
+        if item["ingredient_name"] == ingredient_name:
+            prices.append(item["price"])
+
+    min_price = min(prices)
+    rsp = Response(json.dumps(min_price, default=str), status=200, content_type="application/json")
+
+    return rsp
+
+
 @app.route('/inventories', methods=['GET'])
 def all_inventories():
     res = InventoryResource.get_by_template(None)
@@ -146,4 +174,4 @@ def specific_inventory(inventory_id):
 
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=5000)
+    app.run(host="127.0.0.1", port=5011)
