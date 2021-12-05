@@ -145,6 +145,7 @@ def get_ingredients_recipe(recipe_name):
 #     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
 #     return rsp
 
+# TODO: change the app.route
 @app.route('/inventories/<ingredient_name>', methods=["GET"])
 def lowest_price_of_ingredient(ingredient_name):
     res = InventoryResource.get_by_template(None)
@@ -168,7 +169,8 @@ def all_inventories():
 
 @app.route('/inventories/<inventory_id>', methods=['GET'])
 def specific_inventory(inventory_id):
-    res = InventoryResource.get_by_inventory_id(inventory_id)
+    tmp = {"inventory_id": inventory_id}
+    res = InventoryResource.get_by_template(tmp)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 

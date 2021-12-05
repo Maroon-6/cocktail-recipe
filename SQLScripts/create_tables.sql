@@ -1,3 +1,6 @@
+DROP SCHEMA IF EXISTS cocktails;
+
+CREATE SCHEMA `cocktails`;
 USE cocktails;
 
 DROP TABLE IF EXISTS recipes;
