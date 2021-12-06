@@ -149,11 +149,13 @@ def get_ingredients_recipe(recipe_name):
 def lowest_price_of_ingredient(ingredient_name):
     res = InventoryResource.get_by_template(None)
     prices = []
+    min_price = 0
     for item in res:
         if item["ingredient_name"] == ingredient_name:
             prices.append(item["price"])
 
-    min_price = min(prices)
+    if prices:
+        min_price = min(prices)
     rsp = Response(json.dumps(min_price, default=str), status=200, content_type="application/json")
 
     return rsp
@@ -175,4 +177,4 @@ def specific_inventory(inventory_id):
 
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=5011)
+    app.run(host="127.0.0.1", port=5012)
