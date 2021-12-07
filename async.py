@@ -8,7 +8,7 @@ urls = [
     "http://127.0.0.1:5012/inventories/price"
 ]
 
-# using the following apis
+# created the following apis for this service
 # @app.route('/recipes/<recipe_name>/ingredients', methods=["GET"])
 # @app.route('/inventories/price/<ingredient_name>', methods=["GET"])
 
@@ -56,13 +56,13 @@ def sequential_lowest_price_recipe(recipe_name):
 
 def parallel_lowest_price_recipe(recipe_name):
     s = datetime.now()
+    sum = 0
+
     ingredients = ingredients_of_recipe(recipe_name)
     all_url = (process_url(i) for i in ingredients)
 
     rs = (grequests.get(u) for u in all_url)
     x = grequests.map(rs)
-
-    sum = 0
 
     for r in x:
         sum += json.loads(r.content)
@@ -71,13 +71,10 @@ def parallel_lowest_price_recipe(recipe_name):
     print("parallel total lowest price:", sum)
     return sum
 
-    # for r in x:
-    #     print(r.url, r.status_code)
 
+# testing
 
-#testing
+recipe_n = "Cosmopolitan"
 
-name = "Cosmopolitan"
-
-sequential_lowest_price_recipe(name)
-parallel_lowest_price_recipe(name)
+sequential_lowest_price_recipe(recipe_n)
+parallel_lowest_price_recipe(recipe_n)

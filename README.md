@@ -5,9 +5,13 @@
 >
 > /recipes/<recipe_name> (GET)
 >
+> /recipes/<recipe_name>/ingredients (GET)
+>
 > /inventories (GET)
 >
 > /inventories/<inventory_id> (GET)
+>
+> /inventories/price/<ingredient_name> (GET)
 
 #### Database
 > database design for recipes and inventories
